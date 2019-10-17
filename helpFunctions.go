@@ -5,13 +5,18 @@ import (
 	"math"
 )
 
+func evaluatePoints(g func(float64) float64, x []float64) []float64 {
+	y := make([]float64, len(x))
+	for i := range x {
+		y[i] = g(x[i])
+	}
+	return y
+}
+
 func matrix(c, r int) [][]float64 {
 	var matrix [][]float64
 	for i := 0; i < r; i++ {
-		matrix = append(matrix, []float64{})
-		for j := 0; j < c; j++ {
-			matrix[i] = append(matrix[i], 0.)
-		}
+		matrix = append(matrix, make([]float64, c))
 	}
 	return matrix
 }
@@ -19,12 +24,8 @@ func matrix(c, r int) [][]float64 {
 func FromMattoVec(matrix [][]float64) []float64 {
 	Size := len(matrix) * len(matrix[0])
 	vector := make([]float64, Size)
-	t := 0
 	for i := 0; i < len(matrix); i++ {
-		for j := 0; j < len(matrix[i]); j++ {
-			vector[t] = matrix[i][j]
-			t = t + 1
-		}
+		copy(vector[i*len(matrix[i]):(i+1)*len(matrix[i])], matrix[i])
 	}
 	return vector
 }
@@ -32,10 +33,11 @@ func FromMattoVec(matrix [][]float64) []float64 {
 func nodes(n int) []float64 {
 	nodes := make([]float64, n)
 	h := math.Abs(B-A) / float64(n)
-	nodes[0] = A + h/2
+	nodes[0] = A
 	for i := 1; i < n; i++ {
 		nodes[i] = nodes[i-1] + h
 	}
+	nodes[n-1] = B
 	return nodes
 }
 

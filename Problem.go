@@ -42,10 +42,22 @@ func f(x float64) float64 {
 	return (-1)*(dk(x)*du(x)+k(x)*d2u(x)) + p(x)*du(x) + q(x)*u(x)
 }
 
+func fRitz(x float64) float64 {
+	return (-1)*(dk(x)*du(x)+k(x)*d2u(x)) + q(x)*u(x)
+}
+
 func fWithZeroFunction(x float64) float64 {
 	return (-1)*(dk(x)*dzeroBasic(x)+k(x)*d2zeroBasic(x)) + p(x)*dzeroBasic(x) + q(x)*zeroBasic(x)
 }
 
+func fRitzWithZeroFunction(x float64) float64 {
+	return (-1)*(dk(x)*dzeroBasic(x)+k(x)*d2zeroBasic(x)) + q(x)*zeroBasic(x)
+}
+
 func newF(x float64) float64 {
 	return f(x) - fWithZeroFunction(x)
+}
+
+func newRitzF(x float64) float64 {
+	return fRitz(x) - fRitzWithZeroFunction(x)
 }

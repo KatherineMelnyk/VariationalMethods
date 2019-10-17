@@ -33,27 +33,27 @@ func d2zeroBasic(x float64) float64 {
 	return 0.
 }
 
-func firstBasic(x float64, i int) float64 {
+func firstBasic(x float64) float64 {
 	return math.Pow(x-A, 2) * (x - C())
 }
 
-func dfirstBasic(x float64, i int) float64 {
+func dfirstBasic(x float64) float64 {
 	return 2.*(x-A)*(x-C()) + math.Pow(x-A, 2)
 }
 
-func d2firstBasic(x float64, i int) float64 {
+func d2firstBasic(x float64) float64 {
 	return 2*(x-C()) + 4*(x-A)
 }
 
-func secondBasic(x float64, i int) float64 {
+func secondBasic(x float64) float64 {
 	return math.Pow(B-x, 2) * (x - D())
 }
 
-func dsecondBasic(x float64, i int) float64 {
+func dsecondBasic(x float64) float64 {
 	return -2.*(B-x)*(x-D()) + math.Pow(B-x, 2)
 }
 
-func d2secondBasic(x float64, i int) float64 {
+func d2secondBasic(x float64) float64 {
 	return 2*(x-D()) - 4*(B-x)
 }
 
@@ -61,12 +61,15 @@ func system(x float64, i int) float64 {
 	return math.Pow(x-A, float64(i-1)) * math.Pow(B-x, 2)
 }
 
-func BasicFunc(n int) []func(float64, int) float64 {
-	var phi []func(float64, int) float64
+func BasicFunc(n int) []func(float64) float64 {
+	var phi []func(float64) float64
 	phi = append(phi, firstBasic)
 	phi = append(phi, secondBasic)
 	for i := 2; i < n; i++ {
-		phi = append(phi, system)
+		i := i
+		phi = append(phi, func(x float64) float64 {
+			return system(x, i)
+		})
 	}
 	return phi
 }
@@ -76,12 +79,15 @@ func dsystem(x float64, i int) float64 {
 
 }
 
-func dBasicFunc(n int) []func(float64, int) float64 {
-	var phi []func(float64, int) float64
+func dBasicFunc(n int) []func(float64) float64 {
+	var phi []func(float64) float64
 	phi = append(phi, dfirstBasic)
 	phi = append(phi, dsecondBasic)
 	for i := 2; i < n; i++ {
-		phi = append(phi, dsystem)
+		i := i
+		phi = append(phi, func(x float64) float64 {
+			return dsystem(x, i)
+		})
 	}
 	return phi
 }
@@ -91,12 +97,15 @@ func d2system(x float64, i int) float64 {
 
 }
 
-func d2BasicFunc(n int) []func(float64, int) float64 {
-	var phi []func(float64, int) float64
+func d2BasicFunc(n int) []func(float64) float64 {
+	var phi []func(float64) float64
 	phi = append(phi, d2firstBasic)
 	phi = append(phi, d2secondBasic)
 	for i := 2; i < n; i++ {
-		phi = append(phi, d2system)
+		i := i
+		phi = append(phi, func(x float64) float64 {
+			return d2system(x, i)
+		})
 	}
 	return phi
 }
