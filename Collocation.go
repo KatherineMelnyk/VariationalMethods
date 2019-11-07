@@ -1,10 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"math"
-
-	"fmt"
 
 	"gonum.org/v1/gonum/mat"
 	"gonum.org/v1/plot"
@@ -12,17 +11,15 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
-func systemConstants(n int, x []float64) [][]float64 {
-	sysConst := matrix(n, len(x))
-	phi := BasicFunc(n)
-	dphi := dBasicFunc(n)
-	d2phi := d2BasicFunc(n)
-	for i := range x {
+func systemConstants(count int, points []float64) [][]float64 {
+	sysConst := matrix(count, len(points))
+	d2phi := d2BasicFunc(count)
+	for i, point := range points {
 		for j := range phi {
-			sysConst[i][j] -= dk(x[i]) * dphi[j](x[i])
-			sysConst[i][j] -= k(x[i]) * d2phi[j](x[i])
-			sysConst[i][j] += p(x[i]) * dphi[j](x[i])
-			sysConst[i][j] += q(x[i]) * phi[j](x[i])
+			sysConst[i][j] -= dk(point) * dphi[j](point)
+			sysConst[i][j] -= k(point) * d2phi[j](point)
+			sysConst[i][j] += p(point) * dphi[j](point)
+			sysConst[i][j] += q(point) * phi[j](point)
 			if math.IsNaN(sysConst[i][j]) {
 				sysConst[i][j] = 0
 			}
@@ -31,18 +28,19 @@ func systemConstants(n int, x []float64) [][]float64 {
 	return sysConst
 }
 
-func Collocation(n int, x []float64) []float64 {
-	elements := systemConstants(n, x)
-	valueFunc := make([]float64, len(x))
-	for i := 0; i < len(x); i++ {
-		valueFunc[i] = newF(x[i])
+func Collocation(count int, points []float64) []float64 {
+	elements := systemConstants(count, points)
+	valueFunc := make([]float64, len(points))
+	for i, point := range points {
+		valueFunc[i] = newF(point)
 	}
 	elem := FromMattoVec(elements)
-	F := mat.NewDense(len(x), 1, valueFunc)
+	F := mat.NewDense(len(points), 1, valueFunc)
 	E := mat.NewDense(len(elements), len(elements[0]), elem)
 	var Res mat.Dense
 	Res.Solve(E, F)
-	fmt.Print(E.RawMatrix().Data)
+	//fmt.Print(E.RawMatrix().Data)
+	fmt.Printf("Collocation cond: %.5f\n", mat.Cond(E, 2))
 	res := make([]float64, len(valueFunc))
 	for i := 0; i < len(res); i++ {
 		res[i] = Res.RawRowView(i)[0]
@@ -52,7 +50,6 @@ func Collocation(n int, x []float64) []float64 {
 
 func polinom(value float64) float64 {
 	var answer float64
-	phi := BasicFunc(n)
 	for i, c := range ConstCollocation {
 		answer += c * phi[i](value)
 	}

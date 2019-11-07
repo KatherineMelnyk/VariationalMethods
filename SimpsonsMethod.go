@@ -4,10 +4,6 @@ import "math"
 
 const EPS = 0.00001
 
-//func F2(x float64) float64 {
-//	return math.Pow(math.E, d*x) * math.Sin(c*x)
-//}
-
 func points(a, b float64, n int) []float64 {
 	x := make([]float64, 2*n+1)
 	h := (b - a) / (2 * float64(n))
@@ -30,14 +26,14 @@ func SimpsonsMethod(Func func(float64) float64, a, b float64, n int) float64 {
 	return res
 }
 
-func findUpperBound(Func func(float64) float64, n int) float64 {
-	H := 10000.
-	B := A + 1
-	for math.Abs(SimpsonsMethod(Func, B, H, n)) >= EPS/2 {
-		B++
-	}
-	return B
-}
+//func findUpperBound(Func func(float64) float64, n int) float64 {
+//	H := 10000.
+//	B := A + 1
+//	for math.Abs(SimpsonsMethod(Func, B, H, n)) >= EPS/2 {
+//		B++
+//	}
+//	return B
+//}
 
 func methodRunge(g func(float64) float64, a, b float64, m, n int) int {
 	Ih := SimpsonsMethod(g, a, b, n)
